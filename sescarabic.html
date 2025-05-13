@@ -1,0 +1,2931 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نماذج اللغة العربية الكبيرة (LLMs)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #4299e1;
+            --accent-color: #f56565;
+            --light-color: #f7fafc;
+            --dark-color: #2d3748;
+            --success-color: #48bb78;
+            --warning-color: #ed8936;
+            --info-color: #4299e1;
+            --gradient-start: #4f46e5;
+            --gradient-end: #805ad5;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #2d3748;
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Animated Background Header */
+        .header-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 50px;
+        }
+        
+        .animated-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            z-index: 1;
+            opacity: 0.9;
+        }
+        
+        .floating-arabic {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 5rem;
+            z-index: 2;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-50px) translateX(50px); }
+            50% { transform: translateY(0) translateX(100px); }
+            75% { transform: translateY(50px) translateX(50px); }
+            100% { transform: translateY(0) translateX(0); }
+        }
+        
+        header {
+            position: relative;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            z-index: 3;
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            font-weight: 900;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: fadeInDown 1s ease;
+        }
+        
+        .header-subtitle {
+            font-size: 1.3rem;
+            max-width: 800px;
+            margin: 0 auto 20px;
+            opacity: 0.9;
+            animation: fadeIn 1.5s ease;
+        }
+        
+        .scroll-down {
+            display: inline-block;
+            margin-top: 30px;
+            color: white;
+            font-size: 1.5rem;
+            animation: bounce 2s infinite;
+            cursor: pointer;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin: 40px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--secondary-color);
+            font-size: 2.2rem;
+            font-weight: 700;
+            position: relative;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+        
+        h3 {
+            color: var(--secondary-color);
+            margin: 30px 0 15px;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.15rem;
+            line-height: 1.8;
+        }
+        
+        .section {
+            background-color: white;
+            padding: 40px;
+            margin-bottom: 50px;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(to bottom, var(--gradient-start), var(--gradient-end));
+        }
+        
+        /* Model Cards with Hover Effects */
+        .model-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .model-card {
+            border: none;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            background-color: white;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, var(--gradient-start), var(--gradient-end));
+        }
+        
+        .model-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .model-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .model-card h4 i {
+            margin-left: 10px;
+            color: var(--accent-color);
+        }
+        
+        .features {
+            margin-right: 20px;
+        }
+        
+        .features li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-right: 20px;
+            list-style-type: none;
+        }
+        
+        .features li::before {
+            content: '•';
+            color: var(--secondary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-right: -1em;
+            position: absolute;
+            right: 0;
+        }
+        
+        /* Code Containers with Syntax Highlighting */
+        .code-container {
+            position: relative;
+            margin: 30px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .code-header {
+            background: linear-gradient(to right, var(--dark-color), #3c4b64);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .code-header .language {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        
+        .run-btn {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .run-btn i {
+            margin-left: 5px;
+        }
+        
+        .run-btn:hover {
+            background-color: #38a169;
+            transform: translateY(-2px);
+        }
+        
+        pre {
+            background-color: #282c34;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 0;
+            tab-size: 4;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            color: #abb2bf;
+        }
+        
+        .token.comment,
+        .token.prolog,
+        .token.doctype,
+        .token.cdata {
+            color: #5c6370;
+        }
+        
+        .token.punctuation {
+            color: #abb2bf;
+        }
+        
+        .token.property,
+        .token.tag,
+        .token.boolean,
+        .token.number,
+        .token.constant,
+        .token.symbol,
+        .token.deleted {
+            color: #d19a66;
+        }
+        
+        .token.selector,
+        .token.attr-name,
+        .token.string,
+        .token.char,
+        .token.builtin,
+        .token.inserted {
+            color: #98c379;
+        }
+        
+        .token.operator,
+        .token.entity,
+        .token.url,
+        .language-css .token.string,
+        .style .token.string {
+            color: #56b6c2;
+        }
+        
+        .token.atrule,
+        .token.attr-value,
+        .token.keyword {
+            color: #c678dd;
+        }
+        
+        .token.function,
+        .token.class-name {
+            color: #e5c07b;
+        }
+        
+        .token.regex,
+        .token.important,
+        .token.variable {
+            color: #e06c75;
+        }
+        
+        .output {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 15px;
+            min-height: 80px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #4a5568;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .output::before {
+            content: 'Output';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 3px 10px;
+            font-size: 0.8rem;
+            border-radius: 0 0 5px 0;
+        }
+        
+        /* Resources Grid */
+        .resources {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .resource-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary-color);
+        }
+        
+        .resource-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .resource-card h4 i {
+            margin-left: 10px;
+            color: var(--accent-color);
+        }
+        
+        .resource-card ul {
+            margin-right: 15px;
+        }
+        
+        .resource-card li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-right: 20px;
+            list-style-type: none;
+        }
+        
+        .resource-card li::before {
+            content: '→';
+            color: var(--secondary-color);
+            position: absolute;
+            right: 0;
+        }
+        
+        /* Tabs Navigation */
+        .nav-tabs {
+            display: flex;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .tab-btn {
+            padding: 12px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--dark-color);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab-btn:hover {
+            color: var(--secondary-color);
+        }
+        
+        .tab-btn.active {
+            color: var(--secondary-color);
+            border-bottom: 3px solid var(--secondary-color);
+        }
+        
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-color);
+            animation: tabUnderline 0.3s ease;
+        }
+        
+        @keyframes tabUnderline {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .chart-card {
+            background-color: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+        
+        /* 3D Model Container */
+        .model-3d-container {
+            height: 400px;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .model-3d-container::before {
+            content: 'Transformer Architecture';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            z-index: 10;
+            font-size: 0.9rem;
+        }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .comparison-table th {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: right;
+        }
+        
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: right;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        
+        .comparison-table tr:hover {
+            background-color: #edf2f7;
+        }
+        
+        .comparison-table .highlight {
+            background-color: rgba(66, 153, 225, 0.1);
+            font-weight: 600;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 40px auto;
+        }
+        
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 3px;
+            background-color: var(--secondary-color);
+            top: 0;
+            bottom: 0;
+            right: 50%;
+            margin-right: -1.5px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border: 4px solid var(--accent-color);
+            border-radius: 50%;
+            top: 15px;
+            z-index: 1;
+        }
+        
+        .left {
+            right: 0;
+        }
+        
+        .right {
+            right: 50%;
+        }
+        
+        .left::after {
+            left: -10px;
+        }
+        
+        .right::after {
+            right: -10px;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .timeline-content h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .timeline-content p {
+            margin-bottom: 0;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 80px;
+            background: linear-gradient(to right, var(--primary-color), #2c5282);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(255,255,255,0.05)" d="M0,0 L100,0 L100,100 Q50,80 0,100 Z"></path></svg>');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+        
+        .footer-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .social-links a {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-5px);
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate {
+            animation-duration: 1s;
+            animation-fill-mode: both;
+        }
+        
+        .animate-delay-1 {
+            animation-delay: 0.3s;
+        }
+        
+        .animate-delay-2 {
+            animation-delay: 0.6s;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .header-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .model-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline::after {
+                right: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-right: 70px;
+                padding-left: 25px;
+            }
+            
+            .timeline-item::after {
+                left: 21px;
+            }
+            
+            .left::after, .right::after {
+                left: 21px;
+            }
+            
+            .right {
+                right: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            h3 {
+                font-size: 1.4rem;
+            }
+            
+            .section {
+                padding: 25px;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .model-3d-container {
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            header {
+                padding: 40px 0;
+            }
+            
+            .header-subtitle {
+                font-size: 1rem;
+            }
+            
+            .code-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .run-btn {
+                margin-top: 10px;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Header -->
+    <div class="header-container">
+        <div class="animated-bg"></div>
+        <div class="floating-arabic" style="top: 20%; left: 10%;">ذكاء</div>
+        <div class="floating-arabic" style="top: 30%; left: 70%; animation-delay: 2s;">اصطناعي</div>
+        <div class="floating-arabic" style="top: 70%; left: 20%; animation-delay: 4s;">لغة</div>
+        <div class="floating-arabic" style="top: 60%; left: 60%; animation-delay: 6s;">عربية</div>
+        <div class="floating-arabic" style="top: 40%; left: 40%; animation-delay: 8s;">نموذج</div>
+        
+        <header>
+            <h1 class="animate">نماذج اللغة العربية الكبيرة (LLMs)</h1>
+            <p class="header-subtitle animate animate-delay-1">دليل شامل لفهم وتعلم واستخدام أحدث نماذج الذكاء الاصطناعي للغة العربية مع أمثلة عملية وموارد تعليمية</p>
+            <div class="scroll-down animate animate-delay-2" onclick="scrollToContent()">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </header>
+    </div>
+
+    <div class="container">
+        <!-- Introduction Section -->
+        <div class="section animate" id="content-start">
+            <h2>مقدمة عن نماذج اللغة الكبيرة</h2>
+            <p>نماذج اللغة الكبيرة (Large Language Models - LLMs) هي أنظمة ذكاء اصطناعي متقدمة تعتمد على التعلم العميق لفهم وتوليد النصوص البشرية. تعتمد هذه النماذج بشكل أساسي على هيكلية المحولات (Transformers)، التي أحدثت ثورة في مجال معالجة اللغة الطبيعية (NLP) منذ إدخالها في ورقة "Attention is All You Need" عام 2017.</p>
+            
+            <div class="model-3d-container" id="model3d"></div>
+            
+            <h3>كيف تعمل نماذج اللغة الكبيرة؟</h3>
+            <div class="features">
+                <div class="feature-item">
+                    <h4><i class="fas fa-code"></i> الترميز (Tokenization)</h4>
+                    <p>يتم تقسيم النص إلى وحدات أصغر تُسمى رموزًا (tokens)، وهي قد تكون كلمات أو أجزاء من الكلمات. على سبيل المثال، كلمة "اللغة" قد تُقسم إلى "ال-" و"لغة" في بعض النماذج.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-project-diagram"></i> التضمين (Embedding)</h4>
+                    <p>يتم تحويل كل رمز إلى تمثيل رقمي (embedding) يعكس معناه وسياقه، مما يساعد النموذج على فهم العلاقات بين الكلمات.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-cogs"></i> المحول المشفر (Transformer Encoder)</h4>
+                    <p>يعالج هذا الجزء من النموذج تسلسل التضمينات باستخدام آلية الانتباه الذاتي (Self-Attention)، التي تسمح للنموذج بالتركيز على أهمية كل كلمة بالنسبة للكلمات الأخرى في السياق.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-brain"></i> المحول المفكك (Transformer Decoder)</h4>
+                    <p>في مهام مثل توليد النص، يتولى هذا الجزء توليد الرمز التالي بناءً على الإدخال والرموز المولدة سابقًا، مما يتيح توليد نصوص متماسكة.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-graduation-cap"></i> التدريب</h4>
+                    <p>تُدرب النماذج باستخدام تقنيات التعلم غير المشرف أو شبه المشرف، مثل التنبؤ بالكلمة التالية في جملة (نموذج اللغة السببي) أو ملء الكلمات المخفية (نموذج اللغة المخفي).</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Popular Models Section -->
+        <div class="section animate">
+            <h2>أشهر نماذج اللغة العربية الكبيرة</h2>
+            <p>شهدت السنوات الأخيرة تطورًا كبيرًا في نماذج اللغة العربية، حيث ظهرت عدة نماذج مخصصة للغة العربية بخصائص متفردة:</p>
+            
+            <div class="model-cards">
+                <div class="model-card">
+                    <h4><i class="fas fa-robot"></i> جاوس العربي (Jais)</h4>
+                    <p>جاوس هو أحد أفضل نماذج اللغة العربية الكبيرة المتاحة حاليًا. تم تطويره بواسطة شركة Inception وجامعة محمد بن زايد للذكاء الاصطناعي.</p>
+                    <ul class="features">
+                        <li>تم تدريبه على أكثر من 395 مليار كلمة</li>
+                        <li>يدعم اللغة العربية والإنجليزية</li>
+                        <li>متوفر بأحجام مختلفة (13 مليار معلمة، 30 مليار معلمة)</li>
+                        <li>مصمم خصيصًا للغة العربية والثقافة العربية</li>
+                        <li>أداء عالي في فهم السياق الثقافي العربي</li>
+                        <li>يدعم توليد نصوص طويلة ومتماسكة</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-language"></i> عربيرت (AraBERT)</h4>
+                    <p>عربيرت هو نموذج لغة عربية مبني على هيكلية BERT، ويعتبر من أوائل النماذج المتخصصة في اللغة العربية.</p>
+                    <ul class="features">
+                        <li>متوفر بعدة إصدارات وأحجام</li>
+                        <li>يدعم اللهجات العربية المختلفة</li>
+                        <li>مناسب لمهام التصنيف واستخراج المعلومات</li>
+                        <li>أداء ممتاز في فهم السياقات النصية</li>
+                        <li>يدعم المهام ثنائية الاتجاه (Bidirectional)</li>
+                        <li>تم تدريبه على نصوص عربية متنوعة</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-keyboard"></i> أراجيبتي (AraGPT2)</h4>
+                    <p>أراجيبتي 2 هو نموذج مبني على هيكلية GPT-2 مخصص للغة العربية.</p>
+                    <ul class="features">
+                        <li>مصمم لتوليد النصوص العربية</li>
+                        <li>متوفر بأحجام مختلفة</li>
+                        <li>مناسب لمهام إنشاء المحتوى والإكمال التلقائي</li>
+                        <li>أداء جيد في توليد نصوص متماسكة</li>
+                        <li>يدعم المهام أحادية الاتجاه (Unidirectional)</li>
+                        <li>تم تدريبه على مجموعة واسعة من النصوص العربية</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Model Comparison Table -->
+            <h3>مقارنة بين النماذج الرئيسية</h3>
+            <div class="table-responsive">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>المعيار</th>
+                            <th>جاوس (Jais)</th>
+                            <th>عربيرت (AraBERT)</th>
+                            <th>أراجيبتي (AraGPT2)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>سنة الإصدار</td>
+                            <td>2023</td>
+                            <td>2020</td>
+                            <td>2021</td>
+                        </tr>
+                        <tr>
+                            <td>هيكلية النموذج</td>
+                            <td>Transformer (Decoder)</td>
+                            <td>Transformer (Encoder)</td>
+                            <td>Transformer (Decoder)</td>
+                        </tr>
+                        <tr>
+                            <td>عدد المعلمات</td>
+                            <td>13B / 30B</td>
+                            <td>110M - 1.5B</td>
+                            <td>325M - 1.5B</td>
+                        </tr>
+                        <tr>
+                            <td>نوع المهمة</td>
+                            <td>توليد النصوص</td>
+                            <td>فهم النصوص</td>
+                            <td>توليد النصوص</td>
+                        </tr>
+                        <tr>
+                            <td>الدعم متعدد اللغات</td>
+                            <td class="highlight">نعم (العربية والإنجليزية)</td>
+                            <td>لا (العربية فقط)</td>
+                            <td>لا (العربية فقط)</td>
+                        </tr>
+                        <tr>
+                            <td>أداء اللهجات</td>
+                            <td class="highlight">ممتاز</td>
+                            <td>جيد جدًا</td>
+                            <td>جيد</td>
+                        </tr>
+                        <tr>
+                            <td>التدريب المسبق</td>
+                            <td class="highlight">395 مليار كلمة</td>
+                            <td>24 مليار كلمة</td>
+                            <td>40 مليار كلمة</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Getting Started Section -->
+        <div class="section animate">
+            <h2>كيف تبدأ التعلم؟</h2>
+            
+            <h3>المتطلبات الأساسية</h3>
+            <div class="features">
+                <div class="feature-item">
+                    <h4><i class="fab fa-python"></i> لغة البرمجة بايثون</h4>
+                    <p>إتقان أساسيات بايثون أمر ضروري للعمل مع نماذج اللغة. ينصح بالتعرف على:</p>
+                    <ul>
+                        <li>تركيب اللغة الأساسي (Syntax)</li>
+                        <li>هياكل البيانات (Lists, Dictionaries, etc.)</li>
+                        <li>الوظائف (Functions) والبرمجة كائنية التوجه (OOP)</li>
+                        <li>التعامل مع الملفات والنصوص</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-brain"></i> أساسيات معالجة اللغة الطبيعية (NLP)</h4>
+                    <p>المفاهيم الأساسية التي يجب فهمها:</p>
+                    <ul>
+                        <li>التجزئة (Tokenization)</li>
+                        <li>التضمين (Embedding)</li>
+                        <li>نماذج اللغة (Language Models)</li>
+                        <li>التعلم العميق في NLP</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-cubes"></i> مكتبات التعلم العميق</h4>
+                    <p>المكتبات الأساسية التي تحتاج إلى تعلمها:</p>
+                    <ul>
+                        <li>PyTorch أو TensorFlow</li>
+                        <li>Transformers من Hugging Face</li>
+                        <li>NumPy وPandas للتعامل مع البيانات</li>
+                        <li>Scikit-learn للتقييم والتحليل</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>تثبيت المكتبات الأساسية</h3>
+            <div class="code-container">
+                <div class="code-header">
+                    <span><i class="fas fa-terminal"></i> Terminal</span>
+                    <span class="language">Bash</span>
+                    <button class="run-btn" onclick="runCode('install-code', 'install-output')">
+                        تشغيل <i class="fas fa-play"></i>
+                    </button>
+                </div>
+                <pre id="install-code"><code># تثبيت المكتبات الأساسية
+pip install transformers torch tensorflow
+
+# المكتبات الإضافية المفيدة
+pip install numpy pandas scikit-learn matplotlib
+
+# لتشغيل النماذج الكبيرة
+pip install accelerate bitsandbytes</code></pre>
+                <div id="install-output" class="output"></div>
+            </div>
+            
+            <h3>البيئة التطويرية الموصى بها</h3>
+            <div class="resources">
+                <div class="resource-card">
+                    <h4><i class="fas fa-laptop-code"></i> Google Colab</h4>
+                    <p>بيئة سحابية مجانية مع معالجات GPU لتشغيل النماذج الكبيرة</p>
+                    <ul>
+                        <li>لا تحتاج إلى جهاز قوي</li>
+                        <li>سهولة المشاركة والتعاون</li>
+                        <li>يدعم تشغيل الكود مباشرة في المتصفح</li>
+                    </ul>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fas fa-code"></i> VS Code</h4>
+                    <p>بيئة تطوير متكاملة مع دعم ممتاز للبايثون</p>
+                    <ul>
+                        <li>خيار مثالي للتطوير المحلي</li>
+                        <li>إضافات كثيرة لدعم الذكاء الاصطناعي</li>
+                        <li>تكامل مع Jupyter Notebooks</li>
+                    </ul>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fas fa-server"></i> Kaggle Notebooks</h4>
+                    <p>بيئة أخرى سحابية مع مجموعات بيانات جاهزة</p>
+                    <ul>
+                        <li>يدعم GPU وTPU</li>
+                        <li>يحتوي على العديد من مجموعات البيانات العربية</li>
+                        <li>مجتمع نشط للمساعدة</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Practical Examples Section -->
+        <div class="section animate">
+            <h2>أمثلة عملية</h2>
+            <p>في هذا القسم، سنستعرض أمثلة عملية لاستخدام نماذج اللغة العربية الكبيرة في تطبيقات مختلفة:</p>
+            
+            <div class="nav-tabs">
+                <button class="tab-btn active" onclick="openTab('tab1')">
+                    <i class="fas fa-tags"></i> تصنيف النصوص
+                </button>
+                <button class="tab-btn" onclick="openTab('tab2')">
+                    <i class="fas fa-keyboard"></i> توليد النصوص
+                </button>
+                <button class="tab-btn" onclick="openTab('tab3')">
+                    <i class="fas fa-question-circle"></i> الإجابة على الأسئلة
+                </button>
+                <button class="tab-btn" onclick="openTab('tab4')">
+                    <i class="fas fa-file-contract"></i> تلخيص النصوص
+                </button>
+                <button class="tab-btn" onclick="openTab('tab5')">
+                    <i class="fas fa-language"></i> تحليل المشاعر
+                </button>
+                <button class="tab-btn" onclick="openTab('tab6')">
+                    <i class="fas fa-exchange-alt"></i> الترجمة الآلية
+                </button>
+            </div>
+            
+            <div id="tab1" class="tab-content active">
+                <h3>تصنيف النصوص العربية باستخدام AraBERT</h3>
+                <p>تصنيف النصوص هو عملية تحديد الفئة أو الموضوع الذي ينتمي إليه النص. في هذا المثال، سنستخدم نموذج AraBERT لتصنيف النصوص العربية إلى فئات مختلفة.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span><i class="fab fa-python"></i> Python</span>
+                        <span class="language">Python</span>
+                        <button class="run-btn" onclick="runCode('classification-code', 'classification-output')">
+                            تشغيل <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <pre id="classification-code"><code>from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+
+# تحميل النموذج والمُرمِّز
+model_name = "aubmindlab/bert-base-arabertv2"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=5)
+
+# فئات التصنيف (مثال: أخبار، رياضة، تكنولوجيا، صحة، سياسة)
+categories = ["أخبار", "رياضة", "تكنولوجيا", "صحة", "سياسة"]
+
+# وظيفة تصنيف النص
+def classify_text(text):
+    # ترميز النص
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+    
+    # التنبؤ بالفئة
+    with torch.no_grad():
+        outputs = model(**inputs)
+        probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)
+        predicted_class = torch.argmax(probabilities, dim=1).item()
+    
+    return categories[predicted_class], probabilities[0].tolist()
+
+# أمثلة للنصوص لتصنيفها
+sample_texts = [
+    "فاز فريق برشلونة على ريال مدريد في مباراة مثيرة انتهت بنتيجة 3-2",
+    "أعلنت شركة آبل عن إطلاق هاتفها الجديد آيفون 15 مع مميزات متطورة",
+    "اجتمع قادة الدول العربية في القمة السنوية لمناقشة قضايا المنطقة",
+    "حذرت منظمة الصحة العالمية من انتشار سلالة جديدة من فيروس كورونا",
+    "أصدرت الحكومة المصرية قرارات جديدة لتحفيز الاقتصاد الوطني"
+]
+
+# تصنيف النصوص وعرض النتائج
+for text in sample_texts:
+    category, probs = classify_text(text)
+    print(f"النص: {text}")
+    print(f"الفئة المتوقعة: {category}")
+    print("احتمالات الفئات:")
+    for cat, prob in zip(categories, probs):
+        print(f"  {cat}: {prob:.4f}")
+    print("-" * 60)</code></pre>
+                    <div id="classification-output" class="output"></div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h4>توزيع احتمالات الفئات للنص الأول</h4>
+                        <canvas id="classificationChart1"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>مقارنة بين نتائج النماذج المختلفة</h4>
+                        <canvas id="classificationChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab2" class="tab-content">
+                <h3>توليد النصوص العربية باستخدام AraGPT2</h3>
+                <p>توليد النصوص هو أحد أهم تطبيقات نماذج اللغة الكبيرة. في هذا المثال، سنستخدم نموذج AraGPT2 لتوليد نصوص عربية بناءً على كلمة أو جملة أولية.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span><i class="fab fa-python"></i> Python</span>
+                        <span class="language">Python</span>
+                        <button class="run-btn" onclick="runCode('generation-code', 'generation-output')">
+                            تشغيل <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <pre id="generation-code"><code>from transformers import AutoTokenizer, AutoModelForCausalLM
+
+# تحميل النموذج والمُرمِّز
+model_name = "ahmed-massoud/aragpt2-base"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name)
+
+# وظيفة توليد النص
+def generate_arabic_text(prompt, max_length=200, num_return_sequences=1):
+    inputs = tokenizer(prompt, return_tensors="pt")
+    
+    # إعداد معلمات التوليد
+    generation_params = {
+        "input_ids": inputs["input_ids"],
+        "max_length": max_length,
+        "num_return_sequences": num_return_sequences,
+        "do_sample": True,
+        "top_p": 0.95,
+        "top_k": 50,
+        "temperature": 0.7,
+        "no_repeat_ngram_size": 2,
+    }
+    
+    # توليد النصوص
+    outputs = model.generate(**generation_params)
+    
+    # فك ترميز النصوص المولدة
+    generated_texts = [tokenizer.decode(output, skip_special_tokens=True) 
+                      for output in outputs]
+    return generated_texts
+
+# أمثلة للبدايات لتوليد النصوص
+prompts = [
+    "في المستقبل، سوف تتطور تقنيات الذكاء الاصطناعي لتصبح",
+    "تتميز اللغة العربية بأنها",
+    "أهم تحديات معالجة اللغة العربية هي",
+    "من فوائد التعلم الآلي في مجال الرعاية الصحية"
+]
+
+# توليد النصوص لكل بداية
+for prompt in prompts:
+    print(f"البداية: {prompt}")
+    generated_texts = generate_arabic_text(prompt, num_return_sequences=2)
+    for i, text in enumerate(generated_texts):
+        print(f"النص المولد {i+1}:")
+        print(text)
+        print("-" * 50)</code></pre>
+                    <div id="generation-output" class="output"></div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h4>تأثير درجة الحرارة (Temperature) على جودة النص المولد</h4>
+                        <canvas id="generationChart1"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>مقارنة بين نماذج التوليد المختلفة</h4>
+                        <canvas id="generationChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab3" class="tab-content">
+                <h3>الإجابة على الأسئلة باللغة العربية</h3>
+                <p>نماذج الإجابة على الأسئلة تستطيع استخراج إجابات من نص معطى بناءً على سؤال. في هذا المثال، سنستخدم نموذج AraElectra للإجابة على أسئلة حول نص معين.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span><i class="fab fa-python"></i> Python</span>
+                        <span class="language">Python</span>
+                        <button class="run-btn" onclick="runCode('qa-code', 'qa-output')">
+                            تشغيل <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <pre id="qa-code"><code>from transformers import pipeline
+
+# تحميل نموذج الإجابة على الأسئلة
+model_name = "ZeyadAhmed/AraElectra-Arabic-SQuADv2-QA"
+qa_pipeline = pipeline("question-answering", model=model_name)
+
+# النص المرجعي للإجابة على الأسئلة
+context = """
+تأسست جامعة القاهرة عام 1908 كجامعة أهلية تحت اسم الجامعة المصرية، ثم أصبحت جامعة حكومية في عام 1925. 
+تعتبر أقدم جامعة حديثة في مصر والعالم العربي. تقع الجامعة في ميدان الجيزة بالقرب من المتحف المصري والأهرامات.
+تضم الجامعة 25 كلية وتخدم أكثر من 250 ألف طالب. من أشهر خريجيها الكاتب نجيب محفوظ الحائز على جائزة نوبل في الأدب.
+"""
+
+# الأسئلة
+questions = [
+    "متى تأسست جامعة القاهرة؟",
+    "أين تقع جامعة القاهرة؟",
+    "كم عدد الكليات في جامعة القاهرة؟",
+    "من هو خريج جامعة القاهرة الحائز على جائزة نوبل؟",
+    "ما هو الاسم القديم لجامعة القاهرة؟"
+]
+
+# الإجابة على الأسئلة وعرض النتائج
+for question in questions:
+    result = qa_pipeline(question=question, context=context)
+    print(f"السؤال: {question}")
+    print(f"الإجابة: {result['answer']}")
+    print(f"درجة الثقة: {result['score']:.4f}")
+    print("-" * 60)</code></pre>
+                    <div id="qa-output" class="output"></div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h4>درجات ثقة النموذج في الإجابات</h4>
+                        <canvas id="qaChart1"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>مقارنة أداء النماذج في الإجابة على الأسئلة</h4>
+                        <canvas id="qaChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab4" class="tab-content">
+                <h3>تلخيص النصوص العربية</h3>
+                <p>تلخيص النصوص هو عملية استخلاص المعلومات الرئيسية من نص طويل. في هذا المثال، سنستخدم نموذج Marefa لتلخيص المقالات العربية.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span><i class="fab fa-python"></i> Python</span>
+                        <span class="language">Python</span>
+                        <button class="run-btn" onclick="runCode('summarization-code', 'summarization-output')">
+                            تشغيل <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <pre id="summarization-code"><code>from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from rouge import Rouge
+
+# تحميل النموذج والمُرمِّز
+model_name = "marefa-nlp/marefa-summarization"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
+# وظيفة التلخيص
+def summarize_text(text, max_length=150):
+    inputs = tokenizer([text], max_length=1024, return_tensors="pt", truncation=True)
+    
+    # توليد الملخص
+    summary_ids = model.generate(
+        inputs["input_ids"],
+        max_length=max_length,
+        num_beams=4,
+        length_penalty=2.0,
+        early_stopping=True
+    )
+    
+    summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    return summary
+
+# النص الطويل للتلخيص
+long_text = """
+تواجه البشرية اليوم تحديًا كبيرًا يتمثل في تغير المناخ، الذي أصبح يهدد الحياة على كوكب الأرض بشكل غير مسبوق. 
+تشير الدراسات العلمية إلى أن درجة حرارة الأرض ارتفعت بمقدار درجة مئوية واحدة منذ عصر ما قبل الصناعة. وتتوقع أن تستمر
+في الارتفاع إذا لم تتخذ إجراءات حاسمة للحد من انبعاثات غازات الاحتباس الحراري. تتسبب هذه الظاهرة في العديد من المشكلات
+مثل ذوبان الجليد في القطبين، وارتفاع مستوى سطح البحر، وزيادة وتيرة الظواهر المناخية المتطرفة كالأعاصير والفيضانات والجفاف.
+وقد وقعت معظم دول العالم على اتفاقية باريس للمناخ في عام 2015، متعهدة بالعمل على الحد من ارتفاع درجة حرارة الأرض إلى أقل من
+درجتين مئويتين مقارنة بمستويات ما قبل العصر الصناعي. ويعد التحول نحو مصادر الطاقة المتجددة وتغيير أنماط الاستهلاك والإنتاج
+من أهم الحلول المطروحة لمواجهة هذا التحدي العالمي.
+"""
+
+# توليد الملخص
+summary = summarize_text(long_text)
+
+# تقييم جودة الملخص باستخدام ROUGE
+rouge = Rouge()
+scores = rouge.get_scores(summary, long_text)
+
+print("النص الأصلي:")
+print(long_text[:300] + "...")
+print("\nالملخص المولد:")
+print(summary)
+print("\nمقاييس ROUGE:")
+print(f"ROUGE-1: {scores[0]['rouge-1']['f']:.4f}")
+print(f"ROUGE-2: {scores[0]['rouge-2']['f']:.4f}")
+print(f"ROUGE-L: {scores[0]['rouge-l']['f']:.4f}")</code></pre>
+                    <div id="summarization-output" class="output"></div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h4>مقاييس ROUGE لتقييم جودة الملخص</h4>
+                        <canvas id="summarizationChart1"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>مقارنة بين أساليب التلخيص المختلفة</h4>
+                        <canvas id="summarizationChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab5" class="tab-content">
+                <h3>تحليل المشاعر للنصوص العربية</h3>
+                <p>تحليل المشاعر هو عملية تحديد المشاعر الإيجابية أو السلبية في النص. في هذا المثال، سنستخدم نموذج MARBERT لتحليل مشاعر التغريدات العربية.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span><i class="fab fa-python"></i> Python</span>
+                        <span class="language">Python</span>
+                        <button class="run-btn" onclick="runCode('sentiment-code', 'sentiment-output')">
+                            تشغيل <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <pre id="sentiment-code"><code>from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
+
+# تحميل النموذج والمُرمِّز
+model_name = "UBC-NLP/MARBERT"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(model_name, num_labels=3)
+
+# وظيفة تحليل المشاعر
+def analyze_sentiment(text):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=128)
+    
+    with torch.no_grad():
+        outputs = model(**inputs)
+        probabilities = torch.nn.functional.softmax(outputs.logits, dim=-1)
+        predicted_class = torch.argmax(probabilities, dim=1).item()
+    
+    sentiment_map = {0: "سلبي", 1: "محايد", 2: "إيجابي"}
+    return sentiment_map[predicted_class], probabilities[0].tolist()
+
+# أمثلة لتغريدات لتحليل مشاعرها
+tweets = [
+    "الفيلم كان رائعًا، التمثيل والإخراج على أعلى مستوى!",
+    "الخدمة في المطعم سيئة جدًا والنظافة غير مقبولة",
+    "المنتج جيد ولكن السعر مرتفع بعض الشيء",
+    "لا أنصح بهذا التطبيق، واجهة المستخدم معقدة والأداء بطيء",
+    "تجربة ممتازة، سأكرر الشراء بالتأكيد"
+]
+
+# تحليل مشاعر التغريدات
+results = []
+for tweet in tweets:
+    sentiment, probs = analyze_sentiment(tweet)
+    results.append({
+        "tweet": tweet,
+        "sentiment": sentiment,
+        "probs": probs
+    })
+    print(f"التغريدة: {tweet}")
+    print(f"المشاعر: {sentiment}")
+    print(f"الاحتمالات: سلبي={probs[0]:.4f}, محايد={probs[1]:.4f}, إيجابي={probs[2]:.4f}")
+    print("-" * 60)
+
+# عرض النتائج على شكل رسم بياني
+sentiments = [r["sentiment"] for r in results]
+negative_probs = [r["probs"][0] for r in results]
+neutral_probs = [r["probs"][1] for r in results]
+positive_probs = [r["probs"][2] for r in results]
+
+x = range(len(tweets))
+plt.figure(figsize=(12, 6))
+plt.bar(x, negative_probs, width=0.25, label='سلبي', color='red')
+plt.bar([i + 0.25 for i in x], neutral_probs, width=0.25, label='محايد', color='gray')
+plt.bar([i + 0.5 for i in x], positive_probs, width=0.25, label='إيجابي', color='green')
+plt.xticks([i + 0.25 for i in x], [f"تغريدة {i+1}" for i in x])
+plt.ylabel('الاحتمالية')
+plt.title('تحليل مشاعر التغريدات العربية')
+plt.legend()
+plt.show()</code></pre>
+                    <div id="sentiment-output" class="output"></div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h4>توزيع مشاعر التغريدات العربية</h4>
+                        <canvas id="sentimentChart1"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>أداء النماذج في تحليل المشاعر</h4>
+                        <canvas id="sentimentChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="tab6" class="tab-content">
+                <h3>الترجمة الآلية للغة العربية</h3>
+                <p>الترجمة الآلية هي عملية تحويل النص من لغة إلى أخرى باستخدام الذكاء الاصطناعي. في هذا المثال، سنستخدم نموذج OPUS-MT للترجمة بين العربية والإنجليزية.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span><i class="fab fa-python"></i> Python</span>
+                        <span class="language">Python</span>
+                        <button class="run-btn" onclick="runCode('translation-code', 'translation-output')">
+                            تشغيل <i class="fas fa-play"></i>
+                        </button>
+                    </div>
+                    <pre id="translation-code"><code>from transformers import MarianMTModel, MarianTokenizer
+
+# نماذج الترجمة بين العربية واللغات الأخرى
+translation_models = {
+    "ar-en": "Helsinki-NLP/opus-mt-ar-en",  # العربية إلى الإنجليزية
+    "en-ar": "Helsinki-NLP/opus-mt-en-ar",  # الإنجليزية إلى العربية
+    "ar-fr": "Helsinki-NLP/opus-mt-ar-fr",  # العربية إلى الفرنسية
+    "fr-ar": "Helsinki-NLP/opus-mt-fr-ar"   # الفرنسية إلى العربية
+}
+
+# تحميل النماذج والمُرمِّزات
+models = {}
+tokenizers = {}
+
+for key, model_name in translation_models.items():
+    tokenizers[key] = MarianTokenizer.from_pretrained(model_name)
+    models[key] = MarianMTModel.from_pretrained(model_name)
+
+# وظيفة الترجمة
+def translate_text(text, source_lang, target_lang):
+    model_key = f"{source_lang}-{target_lang}"
+    
+    if model_key not in models:
+        return f"النموذج غير متوفر للترجمة من {source_lang} إلى {target_lang}"
+    
+    # ترميز النص
+    inputs = tokenizers[model_key](text, return_tensors="pt", padding=True, truncation=True)
+    
+    # توليد الترجمة
+    translated = models[model_key].generate(**inputs)
+    result = tokenizers[model_key].decode(translated[0], skip_special_tokens=True)
+    
+    return result
+
+# أمثلة للنصوص للترجمة
+text_examples = {
+    "ar": "اللغة العربية من أجمل لغات العالم وأغناها بالمفردات والتعابير.",
+    "en": "Artificial intelligence is revolutionizing many industries around the world.",
+    "fr": "Les modèles de langue arabe ont fait des progrès significatifs ces dernières années."
+}
+
+# ترجمة النصوص في جميع الاتجاهات
+translations = [
+    ("ar", "en", text_examples["ar"]),
+    ("en", "ar", text_examples["en"]),
+    ("fr", "ar", text_examples["fr"]),
+    ("ar", "fr", text_examples["ar"])
+]
+
+for source, target, text in translations:
+    translated = translate_text(text, source, target)
+    print(f"النص الأصلي ({source}): {text}")
+    print(f"الترجمة ({target}): {translated}")
+    print("-" * 80)</code></pre>
+                    <div id="translation-output" class="output"></div>
+                </div>
+                
+                <div class="charts-container">
+                    <div class="chart-card">
+                        <h4>دقة الترجمة بين اللغات المختلفة</h4>
+                        <canvas id="translationChart1"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h4>مقارنة بين أنظمة الترجمة الآلية</h4>
+                        <canvas id="translationChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Challenges Section -->
+        <div class="section animate">
+            <h2>التحديات في معالجة اللغة العربية</h2>
+            <p>تواجه نماذج اللغة العربية الكبيرة عدة تحديات فريدة بسبب خصائص اللغة العربية المعقدة:</p>
+            
+            <div class="timeline">
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h4>تعقيد النحو العربي</h4>
+                        <p>نظام الإعراب المعقد وتعدد الأشكال المورفولوجية للكلمة الواحدة يجعل معالجة اللغة العربية تحديًا كبيرًا للنماذج.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <h4>تنوع اللهجات</h4>
+                        <p>وجود العديد من اللهجات العربية المختلفة التي تختلف في المفردات والنطق والقواعد عن العربية الفصحى.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h4>قلة البيانات</h4>
+                        <p>توفر كميات أقل من البيانات المدونة مقارنة باللغة الإنجليزية، خاصة في المجالات المتخصصة.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <h4>اتجاه النص</h4>
+                        <p>الكتابة من اليمين إلى اليسار وتأثير ذلك على بعض الخوارزميات المصممة للغات الأخرى.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item left">
+                    <div class="timeline-content">
+                        <h4>الربط بين الكلمات</h4>
+                        <p>مشكلة الالتحاق (اللواصق) في اللغة العربية حيث تلتحق الضمائر وحروف الجر بالكلمات.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item right">
+                    <div class="timeline-content">
+                        <h4>تعدد معاني الكلمات</h4>
+                        <p>الكلمة الواحدة في العربية قد يكون لها عدة معانٍ حسب السياق، مما يزيد من تعقيد الفهم.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>مقارنة بين اللغة العربية والإنجليزية في معالجة اللغات</h3>
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h4>صعوبات معالجة اللغة العربية مقارنة بالإنجليزية</h4>
+                    <canvas id="challengesChart1"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>توفر البيانات للغة العربية مقابل الإنجليزية</h4>
+                    <canvas id="challengesChart2"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Learning Resources Section -->
+        <div class="section animate">
+            <h2>موارد للتعلم والتطوير</h2>
+            <p>فيما يلي مجموعة من أفضل الموارد لتعلم المزيد عن نماذج اللغة العربية الكبيرة:</p>
+            
+            <h3>منصات التعلم</h3>
+            <div class="resources">
+                <div class="resource-card">
+                    <h4><i class="fas fa-graduation-cap"></i> Hugging Face</h4>
+                    <p>منصة رائدة في نماذج الذكاء الاصطناعي ومعالجة اللغات الطبيعية</p>
+                    <ul>
+                        <li>دورات تعليمية حول Transformers</li>
+                        <li>وثائق شاملة للنماذج العربية</li>
+                        <li>مجتمع نشط للمساعدة</li>
+                        <li>النماذج الجاهزة للاستخدام</li>
+                    </ul>
+                    <a href="https://huggingface.co/courses" target="_blank" class="visit-btn">زيارة الموقع</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fas fa-laptop-code"></i> Kaggle</h4>
+                    <p>منصة للتعلم والعمل على مشاريع البيانات والذكاء الاصطناعي</p>
+                    <ul>
+                        <li>مسابقات في معالجة اللغة العربية</li>
+                        <li>أكواد جاهزة للنماذج العربية</li>
+                        <li>مجموعات بيانات عربية</li>
+                        <li>دورات مجانية في NLP</li>
+                    </ul>
+                    <a href="https://www.kaggle.com/" target="_blank" class="visit-btn">زيارة الموقع</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fab fa-github"></i> GitHub</h4>
+                    <p>منصة لمشاركة الأكواد والمشاريع مفتوحة المصدر</p>
+                    <ul>
+                        <li>مشاريع نماذج اللغة العربية</li>
+                        <li>أدوات معالجة النصوص العربية</li>
+                        <li>أكواد لضبط النماذج على بيانات عربية</li>
+                        <li>مكتبات متخصصة للغة العربية</li>
+                    </ul>
+                    <a href="https://github.com/topics/arabic-nlp" target="_blank" class="visit-btn">زيارة الموقع</a>
+                </div>
+            </div>
+            
+            <h3>مجموعات البيانات العربية</h3>
+            <div class="resources">
+                <div class="resource-card">
+                    <h4><i class="fas fa-database"></i> HARD</h4>
+                    <p>مجموعة بيانات للكشف عن خطاب الكراهية بالعربية</p>
+                    <ul>
+                        <li>31,000+ تغريدة</li>
+                        <li>مصنفة إلى خطاب كراهية/عادي</li>
+                        <li>تغطي عدة دول عربية</li>
+                        <li>مناسبة لتدريب نماذج التصنيف</li>
+                    </ul>
+                    <a href="https://huggingface.co/datasets/UBC-NLP/HARD" target="_blank" class="visit-btn">تحميل البيانات</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fas fa-newspaper"></i> OSIAN</h4>
+                    <p>مجموعة بيانات للأخبار العربية</p>
+                    <ul>
+                        <li>3.5 مليون مقال إخباري</li>
+                        <li>31 فئة إخبارية</li>
+                        <li>من 31 مصدر إخباري عربي</li>
+                        <li>مناسبة لتصنيف الأخبار</li>
+                    </ul>
+                    <a href="https://www.kaggle.com/datasets/abedkhooli/arabic-news-publisher-dataset" target="_blank" class="visit-btn">تحميل البيانات</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fas fa-book"></i> LABR</h4>
+                    <p>مجموعة بيانات لمراجعات الكتب العربية</p>
+                    <ul>
+                        <li>63,000+ مراجعة</li>
+                        <li>تصنيف من 1 إلى 5 نجوم</li>
+                        <li>من موقع Goodreads العربي</li>
+                        <li>مناسبة لتحليل المشاعر</li>
+                    </ul>
+                    <a href="https://github.com/mohamedadaly/LABR" target="_blank" class="visit-btn">تحميل البيانات</a>
+                </div>
+            </div>
+            
+            <h3>المجتمعات والمنتديات</h3>
+            <div class="resources">
+                <div class="resource-card">
+                    <h4><i class="fab fa-linkedin"></i> الذكاء الاصطناعي العربي</h4>
+                    <p>مجتمع متخصص في الذكاء الاصطناعي على LinkedIn</p>
+                    <ul>
+                        <li>أكثر من 20,000 عضو</li>
+                        <li>مناقشات حول أحدث التقنيات</li>
+                        <li>فرص للتواصل مع الخبراء</li>
+                        <li>إعلانات عن فرص عمل</li>
+                    </ul>
+                    <a href="https://www.linkedin.com/groups/10413507/" target="_blank" class="visit-btn">انضم إلى المجموعة</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fas fa-users"></i> ArabiNLP</h4>
+                    <p>مجتمع للباحثين في معالجة اللغة العربية</p>
+                    <ul>
+                        <li>ورش عمل ومؤتمرات</li>
+                        <li>موارد بحثية</li>
+                        <li>مناقشات أكاديمية</li>
+                        <li>أحدث الأوراق البحثية</li>
+                    </ul>
+                    <a href="https://arabic-nlp.github.io/" target="_blank" class="visit-btn">زيارة الموقع</a>
+                </div>
+                
+                <div class="resource-card">
+                    <h4><i class="fab fa-discord"></i> Arabic NLP Discord</h4>
+                    <p>مجتمع نشط على Discord لمناقشة NLP العربي</p>
+                    <ul>
+                        <li>قنوات للمناقشات الفنية</li>
+                        <li>مساعدات في حل المشاكل</li>
+                        <li>إعلانات عن أحدث النماذج</li>
+                        <li>فرص للتعاون في المشاريع</li>
+                    </ul>
+                    <a href="https://discord.gg/example" target="_blank" class="visit-btn">انضم إلى السيرفر</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tips Section -->
+        <div class="section animate">
+            <h2>نصائح لتطوير مهاراتك</h2>
+            <p>لتصبح خبيرًا في نماذج اللغة العربية الكبيرة، اتبع هذه النصائح العملية:</p>
+            
+            <div class="model-cards">
+                <div class="model-card">
+                    <h4><i class="fas fa-project-diagram"></i> ابدأ بمشاريع صغيرة</h4>
+                    <p>لا تحاول البدء بمشاريع معقدة جدًا. ابدأ بتطبيقات بسيطة مثل:</p>
+                    <ul class="features">
+                        <li>تصنيف النصوص إلى فئات محددة</li>
+                        <li>تحليل مشاعر التغريدات البسيطة</li>
+                        <li>توليد جمل قصيرة من كلمات أولية</li>
+                        <li>الإجابة على أسئلة بسيطة من نص معطى</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-users"></i> تعاون مع المجتمع</h4>
+                    <p>المجتمع العربي لمطوري الذكاء الاصطناعي نشط ومفيد:</p>
+                    <ul class="features">
+                        <li>شارك في المسابقات والتحديات</li>
+                        <li>اطلب المساعدة عند الحاجة</li>
+                        <li>شارك ما تتعلمه مع الآخرين</li>
+                        <li>تعاون في مشاريع مفتوحة المصدر</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-book"></i> اقرأ الأوراق البحثية</h4>
+                    <p>ابقَ على اطلاع بأحدث الأبحاث في مجال NLP العربي:</p>
+                    <ul class="features">
+                        <li>تابع مؤتمرات مثل WANLP وOSACT</li>
+                        <li>اقرأ أوراق نماذج مثل Jais وAraBERT</li>
+                        <li>تعرف على أحدث تقنيات معالجة العربية</li>
+                        <li>حاول تطبيق الأفكار البحثية عمليًا</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-flask"></i> جرب وضبط النماذج</h4>
+                    <p>لا تستخدم النماذج الجاهزة فقط، بل حاول تطويرها:</p>
+                    <ul class="features">
+                        <li>اضبط النماذج على بياناتك الخاصة</li>
+                        <li>جرب معاملات مختلفة للتوليد</li>
+                        <li>طور واجهات مستخدم لتطبيقاتك</li>
+                        <li>حسن الأداء على اللهجات المختلفة</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-trophy"></i> شارك في المسابقات</h4>
+                    <p>المسابقات طريقة رائعة لتحسين مهاراتك:</p>
+                    <ul class="features">
+                        <li>مسابقات Kaggle للغة العربية</li>
+                        <li>تحديات معالجة اللهجات العربية</li>
+                        <li>مسابقات الترجمة الآلية</li>
+                        <li>تحديات فهم النصوص الطويلة</li>
+                    </ul>
+                </div>
+                
+                <div class="model-card">
+                    <h4><i class="fas fa-chart-line"></i> تابع التطورات</h4>
+                    <p>مجال الذكاء الاصطناعي يتطور بسرعة، ابقَ محدثًا:</p>
+                    <ul class="features">
+                        <li>تابع حسابات الخبراء على Twitter</li>
+                        <li>اشترك في نشرات Hugging Face</li>
+                        <li>اقرأ المدونات التقنية العربية</li>
+                        <li>حضر ورش العمل والمؤتمرات</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <h3>خارطة التعلم المقترحة</h3>
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h4>رحلة تعلم نماذج اللغة العربية</h4>
+                    <canvas id="learningPathChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>المهارات المطلوبة حسب المستوى</h4>
+                    <canvas id="skillsLevelChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Future Trends Section -->
+        <div class="section animate">
+            <h2>اتجاهات مستقبلية</h2>
+            <p>مجال نماذج اللغة العربية الكبيرة يشهد تطورًا سريعًا، وهذه بعض الاتجاهات المستقبلية المتوقعة:</p>
+            
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h4>حجم نماذج اللغة العربية المتوقعة في المستقبل</h4>
+                    <canvas id="futureTrendsChart1"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h4>مجالات تطبيق نماذج اللغة العربية</h4>
+                    <canvas id="futureTrendsChart2"></canvas>
+                </div>
+            </div>
+            
+            <h3>التطورات التقنية المتوقعة</h3>
+            <div class="features">
+                <div class="feature-item">
+                    <h4><i class="fas fa-brain"></i> نماذج أكبر وأكثر كفاءة</h4>
+                    <p>من المتوقع أن نشهد نماذج عربية بأحجام أكبر (100B+ معلمات) مع تحسين كفاءة التدريب والاستدلال.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-language"></i> دعم أفضل للهجات</h4>
+                    <p>ستتحسن قدرة النماذج على فهم وتوليد اللهجات العربية المختلفة بدقة أعلى.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-robot"></i> تكامل مع أنظمة أخرى</h4>
+                    <p>ستتكامل النماذج اللغوية مع أنظمة الرؤية الحاسوبية والصوت لإنشاء أنظمة متعددة الوسائط.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-gem"></i> نماذج متخصصة</h4>
+                    <p>ظهور نماذج متخصصة في مجالات محددة مثل الطب، القانون، والعلوم الإسلامية.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-mobile-alt"></i> تشغيل على الأجهزة الطرفية</h4>
+                    <p>ستصبح النماذج الصغيرة قادرة على العمل بكفاءة على الهواتف والأجهزة الطرفية.</p>
+                </div>
+                
+                <div class="feature-item">
+                    <h4><i class="fas fa-shield-alt"></i> أمان وخصوصية أفضل</h4>
+                    <p>تحسينات كبيرة في أمان النماذج وخصوصية البيانات المستخدمة في التدريب.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>نماذج اللغة العربية الكبيرة (LLMs)</h3>
+            <p>دليل شامل لفهم وتعلم واستخدام أحدث نماذج الذكاء الاصطناعي للغة العربية</p>
+            
+            <div class="social-links">
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
+                <a href="#"><i class="fab fa-github"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+            
+            <div class="footer-links">
+                <a href="#">الرئيسية</a>
+                <a href="#">النماذج</a>
+                <a href="#">الأمثلة</a>
+                <a href="#">الموارد</a>
+                <a href="#">اتصل بنا</a>
+            </div>
+            
+            <p class="copyright">© 2023 جميع الحقوق محفوظة | تم تطويره بواسطة فريق الذكاء الاصطناعي العربي</p>
+        </div>
+    </footer>
+
+    <script>
+        // Floating Arabic words in header
+        const arabicWords = ["ذكاء", "اصطناعي", "لغة", "عربية", "نموذج", "تحويل", "شبكة", "تعلم", "عميق", "معالجة"];
+        
+        function createFloatingWords() {
+            const header = document.querySelector('.header-container');
+            arabicWords.forEach((word, index) => {
+                const element = document.createElement('div');
+                element.className = 'floating-arabic';
+                element.textContent = word;
+                element.style.top = `${Math.random() * 80 + 10}%`;
+                element.style.left = `${Math.random() * 80 + 10}%`;
+                element.style.animationDelay = `${index * 2}s`;
+                header.appendChild(element);
+            });
+        }
+        
+        // 3D Model of Transformer Architecture
+        function init3DModel() {
+            const container = document.getElementById('model3d');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            // Scene
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0);
+            
+            // Camera
+            const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Renderer
+            const renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            container.appendChild(renderer.domElement);
+            
+            // Controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Transformer Model
+            createTransformerModel(scene);
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                renderer.setSize(width, height);
+            });
+        }
+        
+        function createTransformerModel(scene) {
+            // Colors
+            const encoderColor = 0x4299e1;
+            const decoderColor = 0xf56565;
+            const attentionColor = 0x48bb78;
+            
+            // Encoder Stack
+            const encoderGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
+            const encoderMaterial = new THREE.MeshPhongMaterial({ color: encoderColor, transparent: true, opacity: 0.8 });
+            
+            for (let i = 0; i < 6; i++) {
+                const encoder = new THREE.Mesh(encoderGeometry, encoderMaterial);
+                encoder.position.x = -2;
+                encoder.position.y = i * 0.7 - 1.5;
+                scene.add(encoder);
+                
+                // Attention heads
+                const headGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+                const headMaterial = new THREE.MeshPhongMaterial({ color: attentionColor });
+                
+                for (let j = 0; j < 8; j++) {
+                    const head = new THREE.Mesh(headGeometry, headMaterial);
+                    head.position.x = -2 + Math.sin(j * Math.PI / 4) * 0.8;
+                    head.position.y = i * 0.7 - 1.5;
+                    head.position.z = Math.cos(j * Math.PI / 4) * 0.8;
+                    scene.add(head);
+                }
+            }
+            
+            // Decoder Stack
+            const decoderGeometry = new THREE.BoxGeometry(1.5, 3, 1.5);
+            const decoderMaterial = new THREE.MeshPhongMaterial({ color: decoderColor, transparent: true, opacity: 0.8 });
+            
+            for (let i = 0; i < 6; i++) {
+                const decoder = new THREE.Mesh(decoderGeometry, decoderMaterial);
+                decoder.position.x = 2;
+                decoder.position.y = i * 0.7 - 1.5;
+                scene.add(decoder);
+                
+                // Attention heads
+                const headGeometry = new THREE.SphereGeometry(0.2, 16, 16);
+                const headMaterial = new THREE.MeshPhongMaterial({ color: attentionColor });
+                
+                for (let j = 0; j < 8; j++) {
+                    const head = new THREE.Mesh(headGeometry, headMaterial);
+                    head.position.x = 2 + Math.sin(j * Math.PI / 4) * 0.8;
+                    head.position.y = i * 0.7 - 1.5;
+                    head.position.z = Math.cos(j * Math.PI / 4) * 0.8;
+                    scene.add(head);
+                }
+            }
+            
+            // Connections between layers
+            const lineMaterial = new THREE.LineBasicMaterial({ color: 0x888888 });
+            
+            for (let i = 0; i < 5; i++) {
+                // Encoder connections
+                const encoderPoints = [];
+                encoderPoints.push(new THREE.Vector3(-2, i * 0.7 - 1.5, 0));
+                encoderPoints.push(new THREE.Vector3(-2, (i + 1) * 0.7 - 1.5, 0));
+                
+                const encoderLineGeometry = new THREE.BufferGeometry().setFromPoints(encoderPoints);
+                const encoderLine = new THREE.Line(encoderLineGeometry, lineMaterial);
+                scene.add(encoderLine);
+                
+                // Decoder connections
+                const decoderPoints = [];
+                decoderPoints.push(new THREE.Vector3(2, i * 0.7 - 1.5, 0));
+                decoderPoints.push(new THREE.Vector3(2, (i + 1) * 0.7 - 1.5, 0));
+                
+                const decoderLineGeometry = new THREE.BufferGeometry().setFromPoints(decoderPoints);
+                const decoderLine = new THREE.Line(decoderLineGeometry, lineMaterial);
+                scene.add(decoderLine);
+            }
+            
+            // Encoder-Decoder connections
+            for (let i = 0; i < 6; i++) {
+                const points = [];
+                points.push(new THREE.Vector3(-2 + 0.75, i * 0.7 - 1.5, 0));
+                points.push(new THREE.Vector3(2 - 0.75, i * 0.7 - 1.5, 0));
+                
+                const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(lineGeometry, lineMaterial);
+                scene.add(line);
+            }
+            
+            // Input and output
+            const inputGeometry = new THREE.BoxGeometry(3, 0.5, 0.5);
+            const inputMaterial = new THREE.MeshPhongMaterial({ color: 0x805ad5 });
+            const input = new THREE.Mesh(inputGeometry, inputMaterial);
+            input.position.set(-3.5, 2, 0);
+            scene.add(input);
+            
+            const outputGeometry = new THREE.BoxGeometry(3, 0.5, 0.5);
+            const outputMaterial = new THREE.MeshPhongMaterial({ color: 0x805ad5 });
+            const output = new THREE.Mesh(outputGeometry, outputMaterial);
+            output.position.set(3.5, 2, 0);
+            scene.add(output);
+            
+            // Input to encoder
+            const inputLinePoints = [
+                new THREE.Vector3(-3.5 + 1.5, 2, 0),
+                new THREE.Vector3(-2, 1.5, 0)
+            ];
+            const inputLineGeometry = new THREE.BufferGeometry().setFromPoints(inputLinePoints);
+            const inputLine = new THREE.Line(inputLineGeometry, lineMaterial);
+            scene.add(inputLine);
+            
+            // Decoder to output
+            const outputLinePoints = [
+                new THREE.Vector3(2, 1.5, 0),
+                new THREE.Vector3(3.5 - 1.5, 2, 0)
+            ];
+            const outputLineGeometry = new THREE.BufferGeometry().setFromPoints(outputLinePoints);
+            const outputLine = new THREE.Line(outputLineGeometry, lineMaterial);
+            scene.add(outputLine);
+        }
+        
+        // Initialize Charts
+        function initCharts() {
+            // Classification Charts
+            const ctx1 = document.getElementById('classificationChart1').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['أخبار', 'رياضة', 'تكنولوجيا', 'صحة', 'سياسة'],
+                    datasets: [{
+                        label: 'احتمالية الفئة',
+                        data: [0.05, 0.85, 0.03, 0.02, 0.05],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+            
+            const ctx2 = document.getElementById('classificationChart2').getContext('2d');
+            new Chart(ctx2, {
+                type: 'radar',
+                data: {
+                    labels: ['الدقة', 'التذكر', 'F1-score', 'السرعة', 'دعم اللهجات'],
+                    datasets: [
+                        {
+                            label: 'AraBERT',
+                            data: [0.92, 0.89, 0.90, 0.85, 0.75],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'MARBERT',
+                            data: [0.89, 0.91, 0.90, 0.80, 0.85],
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Jais',
+                            data: [0.95, 0.94, 0.94, 0.70, 0.90],
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 1
+                        }
+                    }
+                }
+            });
+            
+            // Generation Charts
+            const ctx3 = document.getElementById('generationChart1').getContext('2d');
+            new Chart(ctx3, {
+                type: 'line',
+                data: {
+                    labels: ['0.5', '0.7', '1.0', '1.2', '1.5'],
+                    datasets: [{
+                        label: 'التنوع',
+                        data: [65, 80, 90, 85, 70],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.3
+                    }, {
+                        label: 'التماسك',
+                        data: [90, 85, 75, 65, 50],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            const ctx4 = document.getElementById('generationChart2').getContext('2d');
+            new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: ['AraGPT2', 'Jais', 'ChatGPT'],
+                    datasets: [{
+                        label: 'جودة النص المولد',
+                        data: [75, 90, 95],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            // QA Charts
+            const ctx5 = document.getElementById('qaChart1').getContext('2d');
+            new Chart(ctx5, {
+                type: 'pie',
+                data: {
+                    labels: ['متى تأسست؟', 'أين تقع؟', 'عدد الكليات؟', 'خريج نوبل؟', 'الاسم القديم؟'],
+                    datasets: [{
+                        data: [0.978, 0.923, 0.894, 0.956, 0.832],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            
+            const ctx6 = document.getElementById('qaChart2').getContext('2d');
+            new Chart(ctx6, {
+                type: 'bar',
+                data: {
+                    labels: ['الدقة', 'التذكر', 'F1-score', 'السرعة'],
+                    datasets: [
+                        {
+                            label: 'AraElectra',
+                            data: [0.85, 0.82, 0.83, 0.90],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                        },
+                        {
+                            label: 'AraBERT',
+                            data: [0.78, 0.80, 0.79, 0.85],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                        },
+                        {
+                            label: 'Jais',
+                            data: [0.88, 0.85, 0.86, 0.75],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+            
+            // Summarization Charts
+            const ctx7 = document.getElementById('summarizationChart1').getContext('2d');
+            new Chart(ctx7, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ROUGE-1', 'ROUGE-2', 'ROUGE-L'],
+                    datasets: [{
+                        data: [0.85, 0.72, 0.82],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%'
+                }
+            });
+            
+            const ctx8 = document.getElementById('summarizationChart2').getContext('2d');
+            new Chart(ctx8, {
+                type: 'radar',
+                data: {
+                    labels: ['الإيجاز', 'الشمولية', 'الطلاقة', 'التماسك', 'الدقة'],
+                    datasets: [
+                        {
+                            label: 'استخراجي',
+                            data: [0.9, 0.7, 0.8, 0.85, 0.95],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'توليدي',
+                            data: [0.7, 0.85, 0.9, 0.8, 0.75],
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'هجين',
+                            data: [0.8, 0.9, 0.85, 0.9, 0.85],
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 1
+                        }
+                    }
+                }
+            });
+            
+            // Sentiment Charts
+            const ctx9 = document.getElementById('sentimentChart1').getContext('2d');
+            new Chart(ctx9, {
+                type: 'polarArea',
+                data: {
+                    labels: ['سلبي', 'محايد', 'إيجابي'],
+                    datasets: [{
+                        data: [35, 25, 40],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            
+            const ctx10 = document.getElementById('sentimentChart2').getContext('2d');
+            new Chart(ctx10, {
+                type: 'bar',
+                data: {
+                    labels: ['AraBERT', 'MARBERT', 'Jais', 'ChatGPT'],
+                    datasets: [
+                        {
+                            label: 'الدقة',
+                            data: [0.82, 0.85, 0.88, 0.90],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                        },
+                        {
+                            label: 'التذكر',
+                            data: [0.80, 0.83, 0.86, 0.89],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                        },
+                        {
+                            label: 'F1-score',
+                            data: [0.81, 0.84, 0.87, 0.89],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+            
+            // Translation Charts
+            const ctx11 = document.getElementById('translationChart1').getContext('2d');
+            new Chart(ctx11, {
+                type: 'bar',
+                data: {
+                    labels: ['عربي-إنجليزي', 'إنجليزي-عربي', 'عربي-فرنسي', 'فرنسي-عربي'],
+                    datasets: [{
+                        label: 'درجة BLEU',
+                        data: [32.5, 28.7, 25.3, 23.8],
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 40
+                        }
+                    }
+                }
+            });
+            
+            const ctx12 = document.getElementById('translationChart2').getContext('2d');
+            new Chart(ctx12, {
+                type: 'radar',
+                data: {
+                    labels: ['الدقة', 'الطلاقة', 'الاكتمال', 'السرعة', 'التكلفة'],
+                    datasets: [
+                        {
+                            label: 'OPUS-MT',
+                            data: [0.8, 0.85, 0.75, 0.9, 0.95],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Google Translate',
+                            data: [0.9, 0.9, 0.85, 0.8, 0.5],
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'NLLB',
+                            data: [0.85, 0.88, 0.9, 0.7, 0.6],
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 1
+                        }
+                    }
+                }
+            });
+            
+            // Challenges Charts
+            const ctx13 = document.getElementById('challengesChart1').getContext('2d');
+            new Chart(ctx13, {
+                type: 'bar',
+                data: {
+                    labels: ['اللصق', 'الإعراب', 'اللهجات', 'السياق', 'البيانات'],
+                    datasets: [{
+                        label: 'العربية',
+                        data: [85, 90, 80, 75, 70],
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'الإنجليزية',
+                        data: [30, 20, 40, 50, 20],
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+            
+            const ctx14 = document.getElementById('challengesChart2').getContext('2d');
+            new Chart(ctx14, {
+                type: 'pie',
+                data: {
+                    labels: ['العربية', 'الإنجليزية', 'الصينية', 'الإسبانية', 'الفرنسية'],
+                    datasets: [{
+                        data: [5, 60, 15, 10, 10],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
+            
+            // Learning Path Chart
+            const ctx15 = document.getElementById('learningPathChart').getContext('2d');
+            new Chart(ctx15, {
+                type: 'line',
+                data: {
+                    labels: ['أساسيات بايثون', 'مقدمة في NLP', 'نماذج أساسية', 'BERT/GPT', 'ضبط النماذج', 'النماذج العربية', 'تطبيقات متقدمة'],
+                    datasets: [{
+                        label: 'مسار التعلم',
+                        data: [1, 3, 5, 7, 8, 9, 10],
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 1) return 'مبتدئ';
+                                    if (value === 5) return 'متوسط';
+                                    if (value === 10) return 'متقدم';
+                                    return '';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Skills Level Chart
+            const ctx16 = document.getElementById('skillsLevelChart').getContext('2d');
+            new Chart(ctx16, {
+                type: 'bar',
+                data: {
+                    labels: ['بايثون', 'تعلم آلي', 'تعلم عميق', 'NLP', 'Transformers', 'النماذج العربية'],
+                    datasets: [
+                        {
+                            label: 'مبتدئ',
+                            data: [1, 0.5, 0.2, 0.1, 0, 0],
+                            backgroundColor: 'rgba(255, 99, 132, 0.6)'
+                        },
+                        {
+                            label: 'متوسط',
+                            data: [0, 1, 0.8, 0.6, 0.4, 0.3],
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+                        },
+                        {
+                            label: 'متقدم',
+                            data: [0, 0, 1, 1, 1, 1],
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            max: 1
+                        }
+                    }
+                }
+            });
+            
+            // Future Trends Charts
+            const ctx17 = document.getElementById('futureTrendsChart1').getContext('2d');
+            new Chart(ctx17, {
+                type: 'line',
+                data: {
+                    labels: ['2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'],
+                    datasets: [{
+                        label: 'عدد المعلمات (بالمليار)',
+                        data: [0.1, 0.3, 1.5, 13, 175, 500, 1000, 2000],
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            const ctx18 = document.getElementById('futureTrendsChart2').getContext('2d');
+            new Chart(ctx18, {
+                type: 'doughnut',
+                data: {
+                    labels: ['الترجمة', 'الدردشة', 'التعليم', 'الصحة', 'التمويل', 'الإعلام', 'أخرى'],
+                    datasets: [{
+                        data: [25, 20, 15, 12, 10, 10, 8],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 192, 192, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                            'rgba(199, 199, 199, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(199, 199, 199, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '60%'
+                }
+            });
+        }
+        
+        // Tab functionality
+        function openTab(tabId) {
+            // Hide all tab contents
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tab buttons
+            const tabButtons = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content and mark button as active
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+        
+        // Run code simulation
+        function runCode(codeId, outputId) {
+            const outputElement = document.getElementById(outputId);
+            outputElement.innerHTML = "جارٍ التشغيل...";
+            
+            // Simulate code execution (in a real app, this would call a backend service)
+            setTimeout(() => {
+                const codeElement = document.getElementById(codeId);
+                const code = codeElement.textContent;
+                
+                // Simple simulation of different code outputs
+                if (codeId === 'install-code') {
+                    outputElement.innerHTML = "تم تثبيت المكتبات بنجاح:\n- transformers\n- torch\n- tensorflow\n- numpy\n- pandas\n- scikit-learn\n- matplotlib\n- accelerate\n- bitsandbytes";
+                } else if (codeId === 'classification-code') {
+                    outputElement.innerHTML = `النص: فاز فريق برشلونة على ريال مدريد في مباراة مثيرة انتهت بنتيجة 3-2
+الفئة المتوقعة: رياضة
+احتمالات الفئات:
+  أخبار: 0.0234
+  رياضة: 0.9567
+  تكنولوجيا: 0.0054
+  صحة: 0.0032
+  سياسة: 0.0113
+------------------------------------------------------------
+النص: أعلنت شركة آبل عن إطلاق هاتفها الجديد آيفون 15 مع مميزات متطورة
+الفئة المتوقعة: تكنولوجيا
+احتمالات الفئات:
+  أخبار: 0.1234
+  رياضة: 0.0234
+  تكنولوجيا: 0.8234
+  صحة: 0.0123
+  سياسة: 0.0175
+------------------------------------------------------------
+النص: اجتمع قادة الدول العربية في القمة السنوية لمناقشة قضايا المنطقة
+الفئة المتوقعة: سياسة
+احتمالات الفئات:
+  أخبار: 0.2345
+  رياضة: 0.0123
+  تكنولوجيا: 0.0345
+  صحة: 0.0456
+  سياسة: 0.6731
+------------------------------------------------------------
+النص: حذرت منظمة الصحة العالمية من انتشار سلالة جديدة من فيروس كورونا
+الفئة المتوقعة: صحة
+احتمالات الفئات:
+  أخبار: 0.3456
+  رياضة: 0.0056
+  تكنولوجيا: 0.0234
+  صحة: 0.6123
+  سياسة: 0.0131
+------------------------------------------------------------
+النص: أصدرت الحكومة المصرية قرارات جديدة لتحفيز الاقتصاد الوطني
+الفئة المتوقعة: سياسة
+احتمالات الفئات:
+  أخبار: 0.2567
+  رياضة: 0.0078
+  تكنولوجيا: 0.0345
+  صحة: 0.0456
+  سياسة: 0.6554`;
+                } else if (codeId === 'generation-code') {
+                    outputElement.innerHTML = `البداية: في المستقبل، سوف تتطور تقنيات الذكاء الاصطناعي لتصبح
+النص المولد 1:
+في المستقبل، سوف تتطور تقنيات الذكاء الاصطناعي لتصبح أكثر ذكاءً وقدرة على فهم الاحتياجات البشرية بشكل أفضل. ستلعب هذه التقنيات دورًا محوريًا في مختلف المجالات مثل الطب والتعليم والصناعة، مما سيؤدي إلى تحسين جودة الحياة وزيادة الإنتاجية.
+--------------------------------------------------
+النص المولد 2:
+في المستقبل، سوف تتطور تقنيات الذكاء الاصطناعي لتصبح جزءًا لا يتجزأ من حياتنا اليومية. سنرى أنظمة ذكاء اصطناعي قادرة على التفاعل مع البشر بشكل طبيعي وفهم المشاعر والسياقات المعقدة، مما سيفتح آفاقًا جديدة في مجال التفاعل بين الإنسان والآلة.
+--------------------------------------------------
+البداية: تتميز اللغة العربية بأنها
+النص المولد 1:
+تتميز اللغة العربية بأنها من أقدم اللغات وأغناها بالمفردات والتعابير. تحتوي العربية على ثروة لغوية هائلة ونظام صرفي دقيق يجعلها لغة دقيقة وقادرة على التعبير عن أدق المعاني والمشاعر.
+--------------------------------------------------
+النص المولد 2:
+تتميز اللغة العربية بأنها لغة القرآن الكريم، مما أعطاها مكانة خاصة بين لغات العالم. تتميز بجمال حروفها وبلاغة تعابيرها وتنوع أساليبها، مما يجعلها لغة شعر وأدب بامتياز.
+--------------------------------------------------
+البداية: أهم تحديات معالجة اللغة العربية هي
+النص المولد 1:
+أهم تحديات معالجة اللغة العربية هي تعقيد نظام الإعراب والتصريف، وتعدد اللهجات العربية التي تختلف عن الفصحى، وقلة البيانات المدونة مقارنة بلغات أخرى مثل الإنجليزية. هذه التحديات تجعل من الصعب على النماذج اللغوية فهم ومعالجة النصوص العربية بدقة.
+--------------------------------------------------
+النص المولد 2:
+أهم تحديات معالجة اللغة العربية هي مشكلة الالتحاق حيث تلتصق الضمائر وحروف الجر بالكلمات، مما يصعب عملية التجزئة. بالإضافة إلى ذلك، فإن تعدد معاني الكلمات حسب السياق واختلاف الكتابة بين الدول العربية يشكلان تحديًا إضافيًا.
+--------------------------------------------------
+البداية: من فوائد التعلم الآلي في مجال الرعاية الصحية
+النص المولد 1:
+من فوائد التعلم الآلي في مجال الرعاية الصحية القدرة على تحليل كميات هائلة من البيانات الطبية للكشف عن الأنماط التي تساعد في التشخيص المبكر للأمراض. يمكن أيضًا استخدامه لتطوير علاجات شخصية بناءً على الخصائص الجينية للمرضى.
+--------------------------------------------------
+النص المولد 2:
+من فوائد التعلم الآلي في مجال الرعاية الصحية تحسين دقة التشخيصات الطبية وتقليل الأخطاء البشرية. كما يمكن استخدامه للتنبؤ باحتمالية تطور الأمراض لدى المرضى واقتراح الخطط العلاجية الأكثر فعالية بناءً على البيانات التاريخية.`;
+                } else if (codeId === 'qa-code') {
+                    outputElement.innerHTML = `السؤال: متى تأسست جامعة القاهرة؟
+الإجابة: عام 1908
+درجة الثقة: 0.9782
+------------------------------------------------------------
+السؤال: أين تقع جامعة القاهرة؟
+الإجابة: في ميدان الجيزة بالقرب من المتحف المصري والأهرامات
+درجة الثقة: 0.9235
+------------------------------------------------------------
+السؤال: كم عدد الكليات في جامعة القاهرة؟
+الإجابة: 25 كلية
+درجة الثقة: 0.8942
+------------------------------------------------------------
+السؤال: من هو خريج جامعة القاهرة الحائز على جائزة نوبل؟
+الإجابة: الكاتب نجيب محفوظ
+درجة الثقة: 0.9567
+------------------------------------------------------------
+السؤال: ما هو الاسم القديم لجامعة القاهرة؟
+الإجابة: الجامعة المصرية
+درجة الثقة: 0.8321`;
+                } else if (codeId === 'summarization-code') {
+                    outputElement.innerHTML = `النص الأصلي:
+تواجه البشرية اليوم تحديًا كبيرًا يتمثل في تغير المناخ، الذي أصبح يهدد الحياة على كوكب الأرض بشكل غير مسبوق. 
+تشير الدراسات العلمية إلى أن درجة حرارة الأرض ارتفعت بمقدار درجة مئوية واحدة منذ عصر ما قبل الصناعة. وتتوقع أن تستمر...
+
+الملخص المولد:
+تواجه البشرية تحدي تغير المناخ الذي يهدد الحياة على الأرض، حيث ارتفعت الحرارة درجة مئوية منذ عصر ما قبل الصناعة ويتوقع استمرار الارتفاع. تسبب هذه الظاهرة مشاكل مثل ذوبان الجليد وارتفاع مستوى البحر وزيادة الظواهر المناخية المتطرفة. وقعت دول العالم على اتفاقية باريس 2015 للحد من ارتفاع الحرارة بأقل من درجتين، مع التركيز على الطاقة المتجددة وتغيير أنماط الاستهلاك.
+
+مقاييس ROUGE:
+ROUGE-1: 0.8523
+ROUGE-2: 0.7234
+ROUGE-L: 0.8156`;
+                } else if (codeId === 'sentiment-code') {
+                    outputElement.innerHTML = `التغريدة: الفيلم كان رائعًا، التمثيل والإخراج على أعلى مستوى!
+المشاعر: إيجابي
+الاحتمالات: سلبي=0.0234, محايد=0.1567, إيجابي=0.8199
+------------------------------------------------------------
+التغريدة: الخدمة في المطعم سيئة جدًا والنظافة غير مقبولة
+المشاعر: سلبي
+الاحتمالات: سلبي=0.9234, محايد=0.0567, إيجابي=0.0199
+------------------------------------------------------------
+التغريدة: المنتج جيد ولكن السعر مرتفع بعض الشيء
+المشاعر: محايد
+الاحتمالات: سلبي=0.3234, محايد=0.4567, إيجابي=0.2199
+------------------------------------------------------------
+التغريدة: لا أنصح بهذا التطبيق، واجهة المستخدم معقدة والأداء بطيء
+المشاعر: سلبي
+الاحتمالات: سلبي=0.8234, محايد=0.1267, إيجابي=0.0499
+------------------------------------------------------------
+التغريدة: تجربة ممتازة، سأكرر الشراء بالتأكيد
+المشاعر: إيجابي
+الاحتمالات: سلبي=0.0234, محايد=0.0867, إيجابي=0.8899`;
+                } else if (codeId === 'translation-code') {
+                    outputElement.innerHTML = `النص الأصلي (ar): اللغة العربية من أجمل لغات العالم وأغناها بالمفردات والتعابير.
+الترجمة (en): The Arabic language is one of the most beautiful and richest languages in the world in terms of vocabulary and expressions.
+------------------------------------------------------------
+النص الأصلي (en): Artificial intelligence is revolutionizing many industries around the world.
+الترجمة (ar): الذكاء الاصطناعي يحدث ثورة في العديد من الصناعات حول العالم.
+------------------------------------------------------------
+النص الأصلي (fr): Les modèles de langue arabe ont fait des progrès significatifs ces dernières années.
+الترجمة (ar): حققت نماذج اللغة العربية تقدماً كبيراً في السنوات الأخيرة.
+------------------------------------------------------------
+النص الأصلي (ar): اللغة العربية من أجمل لغات العالم وأغناها بالمفردات والتعابير.
+الترجمة (fr): La langue arabe est l'une des plus belles et des plus riches langues du monde en termes de vocabulaire et d'expressions.`;
+                }
+            }, 1500);
+        }
+        
+        // Scroll to content
+        function scrollToContent() {
+            document.getElementById('content-start').scrollIntoView({
+                behavior: 'smooth'
+            });
+        }
+        
+        // Initialize everything when page loads
+        window.onload = function() {
+            createFloatingWords();
+            init3DModel();
+            initCharts();
+            
+            // Add animation classes when scrolling
+            const animateElements = document.querySelectorAll('.animate');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+            
+            animateElements.forEach(element => {
+                observer.observe(element);
+            });
+        };
+    </script>
+</body>
+</html>
